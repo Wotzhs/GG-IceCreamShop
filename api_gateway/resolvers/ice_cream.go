@@ -43,15 +43,15 @@ func (r *IceCreamResolver) Ingredients() *[]string {
 }
 
 func (r *IceCreamResolver) AllergyInfo() *string {
-	return &r.i.AllergyInfo
+	return r.i.AllergyInfo
 }
 
 func (r *IceCreamResolver) DietaryCertifications() *string {
-	return &r.i.DietaryCertifications
+	return r.i.DietaryCertifications
 }
 
 func (r *IceCreamResolver) ProductID() *graphql.ID {
-	return &r.i.ProductID
+	return r.i.ProductID
 }
 
 type IceCreamResultsResolver struct {

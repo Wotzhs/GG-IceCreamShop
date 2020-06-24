@@ -22,14 +22,38 @@ var GraphSchema string = `
 		after: ID
 	}
 
-	#type Mutation {
-	#	createIceCream(details: IceCream): IceCream!
-	#	updateIceCream(details: IceCream): IceCream!
-	#	deleteIceCream(details: IceCream): String
-	#}
-
 	type Auth {
 		jwt_token: String!
+	}
+
+	type IceCreamResults {
+		ice_creams: [IceCream!]
+		total_count: Int!
+		has_next: Boolean!
+	}
+
+	type Mutation {
+		createIceCream(details: NewIceCream!): IceCream!
+	#	updateIceCream(details: UpdateIceCream): IceCream!
+	#	deleteIceCream(id: ID): String
+	}
+
+	input NewIceCream {
+		name: String!
+		image_closed: String!
+		image_open: String!
+		description: String!
+		story: String!
+		sourcing_values: [String!]
+		ingredients: [String!]
+		allergy_info: String
+		dietary_certifications: String
+		product_id: ID
+	}
+
+	input UpdateIceCream {
+		id: ID!
+		updated_details: NewIceCream
 	}
 
 	type IceCream {
@@ -44,11 +68,5 @@ var GraphSchema string = `
 		allergy_info: String
 		dietary_certifications: String
 		product_id: ID
-	}
-
-	type IceCreamResults {
-		ice_creams: [IceCream!]
-		total_count: Int!
-		has_next: Boolean!
 	}
 `

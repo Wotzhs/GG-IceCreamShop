@@ -18,7 +18,7 @@ type IceCream struct {
 	Story                 string
 	SourcingValues        *[]string
 	Ingredients           *[]string
-	AllergyInfo           string
-	DietaryCertifications string
-	ProductID             graphql.ID
+	AllergyInfo           *string
+	DietaryCertifications *string
+	ProductID             *graphql.ID
 }

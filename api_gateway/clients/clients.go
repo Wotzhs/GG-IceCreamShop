@@ -1,11 +1,11 @@
 package clients
 
 import (
-	"GG-IceCreamShop/proto/auth"
-	"GG-IceCreamShop/proto/ice_cream"
-	"GG-IceCreamShop/proto/user"
 	"log"
 	"os"
+	"proto/auth"
+	"proto/ice_cream"
+	"proto/user"
 
 	"google.golang.org/grpc"
 )

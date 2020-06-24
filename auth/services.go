@@ -1,8 +1,8 @@
 package main
 
 import (
-	"GG-IceCreamShop/proto/auth"
 	"context"
+	"proto/auth"
 )
 
 type AuthService struct{}

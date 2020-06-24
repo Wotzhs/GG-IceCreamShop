@@ -9,7 +9,7 @@ import (
 	"syscall"
 	"time"
 
-	"GG-IceCreamShop/proto/auth"
+	"proto/auth"
 
 	"google.golang.org/grpc"
 )

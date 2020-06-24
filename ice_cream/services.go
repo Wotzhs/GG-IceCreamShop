@@ -1,8 +1,8 @@
 package main
 
 import (
-	"GG-IceCreamShop/proto/ice_cream"
 	"context"
+	"proto/ice_cream"
 
 	"github.com/golang/protobuf/ptypes/empty"
 )

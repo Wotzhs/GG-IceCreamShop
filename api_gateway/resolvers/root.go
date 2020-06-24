@@ -3,10 +3,9 @@ package resolvers
 import (
 	"GG-IceCreamShop/api_gateway/clients"
 	"GG-IceCreamShop/api_gateway/types"
-	"GG-IceCreamShop/proto/auth"
-	"GG-IceCreamShop/proto/ice_cream"
 	"context"
-	"fmt"
+	"proto/auth"
+	"proto/ice_cream"
 
 	graphql "github.com/graph-gophers/graphql-go"
 )
@@ -18,10 +17,14 @@ type RootResolver struct {
 
 type Query struct{}
 
-func (r *Query) Login(ctx context.Context, args struct{ Email, Password string }) (*AuthResolver, error) {
+type CredentialsArgs struct {
+	Input types.Credentials
+}
+
+func (r *Query) Login(ctx context.Context, args CredentialsArgs) (*AuthResolver, error) {
 	payload := &auth.Credentials{
-		Email:    args.Email,
-		Password: args.Password,
+		Email:    args.Input.Email,
+		Password: args.Input.Password,
 	}
 
 	resp, err := clients.Auth.GenerateJWTToken(ctx, payload)
@@ -141,9 +144,18 @@ func (r *Mutation) DeleteIceCream(ctx context.Context, args struct{ ID graphql.I
 		Id: string(args.ID),
 	}
 
-	resp, err := clients.IceCream.Delete(ctx, payload)
+	_, err := clients.IceCream.Delete(ctx, payload)
 
-	fmt.Printf("hahaha %#v\n", resp)
+	return nil, err
+}
+
+func (r *Mutation) CreateUser(ctx context.Context, args CredentialsArgs) (*string, error) {
+	payload := &auth.Credentials{
+		Email:    args.Input.Email,
+		Password: args.Input.Password,
+	}
+
+	_, err := clients.User.Create(ctx, payload)
 
 	return nil, err
 }

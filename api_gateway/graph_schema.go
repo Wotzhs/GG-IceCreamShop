@@ -13,29 +13,20 @@ var RelayHandler = &relay.Handler{
 
 var GraphSchema string = `
 	type Query {
-		login(email: String!, password: String!): Auth!
+		login(input: Credentials!): Auth!
 		getIceCreams(query: IceCreamQuery): IceCreamResults!
-	}
-
-	input IceCreamQuery {
-		first: Int
-		after: ID
-	}
-
-	type Auth {
-		jwt_token: String!
-	}
-
-	type IceCreamResults {
-		ice_creams: [IceCream!]
-		total_count: Int!
-		has_next: Boolean!
 	}
 
 	type Mutation {
 		createIceCream(input: IceCreamInput!): IceCream!
 		updateIceCream(id: ID!, input: IceCreamInput!): IceCream!
 		deleteIceCream(id: ID!): String
+		createUser(input: Credentials!): String
+	}
+
+	input Credentials {
+		email: String!
+		password: String!
 	}
 
 	input IceCreamInput {
@@ -51,6 +42,15 @@ var GraphSchema string = `
 		product_id: ID
 	}
 
+	input IceCreamQuery {
+		first: Int
+		after: ID
+	}
+
+	type Auth {
+		jwt_token: String!
+	}
+
 	type IceCream {
 		id: ID!
 		name: String!
@@ -63,5 +63,11 @@ var GraphSchema string = `
 		allergy_info: String
 		dietary_certifications: String
 		product_id: ID
+	}
+
+	type IceCreamResults {
+		ice_creams: [IceCream!]
+		total_count: Int!
+		has_next: Boolean!
 	}
 `

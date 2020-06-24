@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+option go_package = "proto/auth";
+
+package auth;
+
+service Auth {
+	rpc GenerateJWTToken(Credentials) returns (JWTToken);
+}
+
+message Credentials {
+	string email = 1;
+	string password = 2;
+}
+
+message JWTToken {
+	string jwt_token = 1;
+}

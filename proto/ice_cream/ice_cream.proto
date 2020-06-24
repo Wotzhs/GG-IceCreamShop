@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "proto/ice_cream";
+
+package ice_cream;
+
+service IceCream {
+	rpc Get(IceCreamQuery) returns (IceCreams);
+	rpc Create(IceCreamDetails) returns (IceCreamDetails);
+	rpc Update(IceCreamDetails) returns (IceCreamDetails);
+	rpc Delete(IceCreamDetails) returns (google.protobuf.Empty);
+}
+
+message IceCreamQuery {
+	int32 first = 1;
+	string after = 2;
+}
+
+message IceCreamDetails {
+	string id = 1;
+	string name = 2;
+	string image_closed = 3;
+	string image_open = 4;
+	string description = 5;
+	string story = 6;
+	repeated string sourcing_values = 7;
+	repeated string ingredients = 8;
+	string allergy_info = 9;
+	string dietary_certifications = 10;
+	string product_id = 11;
+}
+
+message IceCreams {
+	repeated IceCreamDetails ice_creams = 1;
+}

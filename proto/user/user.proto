@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "proto/user";
+
+package user;
+
+service User {
+	rpc Create (Credentials) returns (google.protobuf.Empty);
+};
+
+message Credentials {
+	string email = 1;
+	string password = 2;
+}

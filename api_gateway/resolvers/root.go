@@ -6,6 +6,7 @@ import (
 	"GG-IceCreamShop/proto/auth"
 	"GG-IceCreamShop/proto/ice_cream"
 	"context"
+	"fmt"
 
 	graphql "github.com/graph-gophers/graphql-go"
 )
@@ -133,4 +134,16 @@ func (r *Mutation) UpdateIceCream(ctx context.Context, args UpdateIceCreamArgs) 
 		ProductID:             &productID,
 	}
 	return &IceCreamResolver{iceCream}, err
+}
+
+func (r *Mutation) DeleteIceCream(ctx context.Context, args struct{ ID graphql.ID }) (*string, error) {
+	payload := &ice_cream.IceCreamDetails{
+		Id: string(args.ID),
+	}
+
+	resp, err := clients.IceCream.Delete(ctx, payload)
+
+	fmt.Printf("hahaha %#v\n", resp)
+
+	return nil, err
 }

@@ -35,7 +35,7 @@ var GraphSchema string = `
 	type Mutation {
 		createIceCream(input: IceCreamInput!): IceCream!
 		updateIceCream(id: ID!, input: IceCreamInput!): IceCream!
-	#	deleteIceCream(id: ID): String
+		deleteIceCream(id: ID!): String
 	}
 
 	input IceCreamInput {
@@ -52,7 +52,7 @@ var GraphSchema string = `
 	}
 
 	type IceCream {
-		id: ID
+		id: ID!
 		name: String!
 		image_closed: String!
 		image_open: String!

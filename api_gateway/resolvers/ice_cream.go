@@ -10,8 +10,8 @@ type IceCreamResolver struct {
 	i *types.IceCream
 }
 
-func (r *IceCreamResolver) ID() *graphql.ID {
-	return &r.i.ID
+func (r *IceCreamResolver) ID() graphql.ID {
+	return r.i.ID
 }
 
 func (r *IceCreamResolver) Name() string {

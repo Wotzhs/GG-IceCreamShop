@@ -60,18 +60,18 @@ func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceC
 
 type Mutation struct{}
 
-func (r *Mutation) CreateIceCream(ctx context.Context, args struct{ Details *types.IceCream }) (*IceCreamResolver, error) {
+func (r *Mutation) CreateIceCream(ctx context.Context, args struct{ Input *types.IceCream }) (*IceCreamResolver, error) {
 	payload := &ice_cream.IceCreamDetails{
-		Name:                  args.Details.Name,
-		ImageClosed:           args.Details.ImageClosed,
-		ImageOpen:             args.Details.ImageOpen,
-		Description:           args.Details.Description,
-		Story:                 args.Details.Story,
-		SourcingValues:        *args.Details.SourcingValues,
-		Ingredients:           *args.Details.Ingredients,
-		AllergyInfo:           *args.Details.AllergyInfo,
-		DietaryCertifications: *args.Details.DietaryCertifications,
-		ProductId:             string(*args.Details.ProductID),
+		Name:                  args.Input.Name,
+		ImageClosed:           args.Input.ImageClosed,
+		ImageOpen:             args.Input.ImageOpen,
+		Description:           args.Input.Description,
+		Story:                 args.Input.Story,
+		SourcingValues:        *args.Input.SourcingValues,
+		Ingredients:           *args.Input.Ingredients,
+		AllergyInfo:           *args.Input.AllergyInfo,
+		DietaryCertifications: *args.Input.DietaryCertifications,
+		ProductId:             string(*args.Input.ProductID),
 	}
 
 	resp, err := clients.IceCream.Create(ctx, payload)
@@ -92,5 +92,45 @@ func (r *Mutation) CreateIceCream(ctx context.Context, args struct{ Details *typ
 		ProductID:             &productID,
 	}
 
+	return &IceCreamResolver{iceCream}, err
+}
+
+type UpdateIceCreamArgs struct {
+	ID    graphql.ID
+	Input *types.IceCream
+}
+
+func (r *Mutation) UpdateIceCream(ctx context.Context, args UpdateIceCreamArgs) (*IceCreamResolver, error) {
+	payload := &ice_cream.IceCreamDetails{
+		Id:                    string(args.ID),
+		Name:                  args.Input.Name,
+		ImageClosed:           args.Input.ImageClosed,
+		ImageOpen:             args.Input.ImageOpen,
+		Description:           args.Input.Description,
+		Story:                 args.Input.Story,
+		SourcingValues:        *args.Input.SourcingValues,
+		Ingredients:           *args.Input.Ingredients,
+		AllergyInfo:           *args.Input.AllergyInfo,
+		DietaryCertifications: *args.Input.DietaryCertifications,
+		ProductId:             string(*args.Input.ProductID),
+	}
+
+	resp, err := clients.IceCream.Update(ctx, payload)
+
+	productID := graphql.ID(resp.ProductId)
+
+	iceCream := &types.IceCream{
+		ID:                    graphql.ID(resp.Id),
+		Name:                  resp.Name,
+		ImageClosed:           resp.ImageClosed,
+		ImageOpen:             resp.ImageOpen,
+		Description:           resp.Description,
+		Story:                 resp.Story,
+		SourcingValues:        &resp.SourcingValues,
+		Ingredients:           &resp.Ingredients,
+		AllergyInfo:           &resp.AllergyInfo,
+		DietaryCertifications: &resp.DietaryCertifications,
+		ProductID:             &productID,
+	}
 	return &IceCreamResolver{iceCream}, err
 }

@@ -33,12 +33,12 @@ var GraphSchema string = `
 	}
 
 	type Mutation {
-		createIceCream(details: NewIceCream!): IceCream!
-	#	updateIceCream(details: UpdateIceCream): IceCream!
+		createIceCream(input: IceCreamInput!): IceCream!
+		updateIceCream(id: ID!, input: IceCreamInput!): IceCream!
 	#	deleteIceCream(id: ID): String
 	}
 
-	input NewIceCream {
+	input IceCreamInput {
 		name: String!
 		image_closed: String!
 		image_open: String!
@@ -49,11 +49,6 @@ var GraphSchema string = `
 		allergy_info: String
 		dietary_certifications: String
 		product_id: ID
-	}
-
-	input UpdateIceCream {
-		id: ID!
-		updated_details: NewIceCream
 	}
 
 	type IceCream {

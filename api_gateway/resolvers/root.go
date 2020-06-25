@@ -28,7 +28,11 @@ func (r *Query) Login(ctx context.Context, args CredentialsArgs) (*AuthResolver,
 	}
 
 	resp, err := clients.Auth.GenerateJWTToken(ctx, payload)
-	return &AuthResolver{&types.Auth{resp.JwtToken}}, err
+	if err != nil {
+		return nil, err
+	}
+
+	return &AuthResolver{&types.Auth{resp.JwtToken}}, nil
 }
 
 func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceCreamQuery }) (*IceCreamResultsResolver, error) {

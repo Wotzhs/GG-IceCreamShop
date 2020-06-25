@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"proto/auth"
+	"proto/user"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
@@ -30,4 +31,12 @@ func (s *UserServerRPC) Create(ctx context.Context, req *auth.Credentials) (*emp
 	}
 
 	return &empty.Empty{}, nil
+}
+
+func (s *UserServerRPC) GetPasswordHash(ctx context.Context, req *auth.Credentials) (*user.PasswordHash, error) {
+	hash, err := userService.GetPasswordHash(req.Email)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "%v", err)
+	}
+	return &user.PasswordHash{Hash: hash}, nil
 }

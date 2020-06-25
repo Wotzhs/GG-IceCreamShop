@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -19,6 +20,7 @@ func init() {
 }
 
 func SetMiddlewares(mux http.Handler) http.Handler {
+	mux = InjectAuthTokenPlaceholderCtx(mux)
 	mux = TimeRequestCompletion(mux)
 	mux = LogRequest(mux)
 	return mux
@@ -56,5 +58,14 @@ func TimeRequestCompletion(next http.Handler) http.Handler {
 		start := time.Now()
 		next.ServeHTTP(w, r)
 		log.Printf("%v %v completed in %.2fms", r.Method, r.URL.Path, float64(time.Now().Sub(start).Nanoseconds())/float64(time.Millisecond))
+	})
+}
+
+func InjectAuthTokenPlaceholderCtx(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var placeholder string
+		ctx := context.WithValue(r.Context(), "authtoken", &placeholder)
+		r = r.WithContext(ctx)
+		next.ServeHTTP(w, r)
 	})
 }

@@ -14,6 +14,7 @@ import (
 var (
 	chainedUnaryInterceptors grpc.ServerOption
 	passwordCensorRe         *regexp.Regexp
+	hashCensorRe             *regexp.Regexp
 )
 
 func init() {
@@ -24,6 +25,7 @@ func init() {
 	))
 
 	passwordCensorRe = regexp.MustCompile(`(?i)(password:)(\"\w+\")`)
+	hashCensorRe = regexp.MustCompile(`(?i)(hash:)(\".*\")`)
 }
 
 func RequestLogger(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
@@ -47,6 +49,7 @@ func ResponseLogger(ctx context.Context, req interface{}, info *grpc.UnaryServer
 	h, err := handler(ctx, req)
 	logInfo := fmt.Sprintf("%v %v response: %v err: %v", info.FullMethod, req, h, err)
 	censoredLogInfo := passwordCensorRe.ReplaceAllString(logInfo, `$1"****"`)
+	censoredLogInfo = hashCensorRe.ReplaceAllString(censoredLogInfo, `$1"****"`)
 	log.Printf(censoredLogInfo)
 	return h, err
 }

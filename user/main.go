@@ -30,8 +30,8 @@ func main() {
 
 	opts := []grpc.ServerOption{chainedUnaryInterceptors}
 	server := grpc.NewServer(opts...)
-	userService := &UserService{}
-	user.RegisterUserServer(server, userService)
+	userServerRPC := &UserServerRPC{}
+	user.RegisterUserServer(server, userServerRPC)
 
 	go func() {
 		if err := server.Serve(listener); err != nil {

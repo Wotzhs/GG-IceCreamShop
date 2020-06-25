@@ -32,6 +32,10 @@ func (r *Query) Login(ctx context.Context, args CredentialsArgs) (*AuthResolver,
 		return nil, err
 	}
 
+	// hack - graphql-go library doesn't have access to responseWritter to set cookie
+	authtoken := ctx.Value("authtoken").(*string)
+	*authtoken = resp.JwtToken
+
 	return &AuthResolver{&types.Auth{resp.JwtToken}}, nil
 }
 

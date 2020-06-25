@@ -25,7 +25,7 @@ func init() {
 	))
 
 	passwordCensorRe = regexp.MustCompile(`(?i)(password:)(\"\w+\")`)
-	jwtTokenCensorRe = regexp.MustCompile(`(?:)(jwt_token:)(\"\w.*\")`)
+	jwtTokenCensorRe = regexp.MustCompile(`(?i)(jwt_token:)(\"\w.*\")`)
 }
 
 func RequestLogger(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {

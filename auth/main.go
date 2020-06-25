@@ -23,6 +23,10 @@ func init() {
 }
 
 func main() {
+	for _, grpcConn := range RegisterGrpcServices() {
+		defer grpcConn.Close()
+	}
+
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen on port %s", port)
@@ -30,8 +34,8 @@ func main() {
 
 	opts := []grpc.ServerOption{chainedUnaryInterceptors}
 	server := grpc.NewServer(opts...)
-	authService := &AuthService{}
-	auth.RegisterAuthServer(server, authService)
+	authServerRPC := &AuthServerRPC{}
+	auth.RegisterAuthServer(server, authServerRPC)
 
 	go func() {
 		if err := server.Serve(listener); err != nil {

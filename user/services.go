@@ -22,3 +22,14 @@ func (s *UserService) CreateUser(user *User) error {
 
 	return nil
 }
+
+func (s *UserService) GetPasswordHash(email string) (string, error) {
+	query := "SELECT password_hash FROM users WHERE email = $1"
+
+	var hash string
+	if err := db.QueryRow(query, email).Scan(&hash); err != nil {
+		return "", err
+	}
+
+	return hash, nil
+}

@@ -28,7 +28,15 @@ func (r *Query) Login(ctx context.Context, args CredentialsArgs) (*AuthResolver,
 	}
 
 	resp, err := clients.Auth.GenerateJWTToken(ctx, payload)
-	return &AuthResolver{&types.Auth{resp.JwtToken}}, err
+	if err != nil {
+		return nil, err
+	}
+
+	// hack - graphql-go library doesn't have access to responseWritter to set cookie
+	authtoken := ctx.Value("authtoken").(*string)
+	*authtoken = resp.JwtToken
+
+	return &AuthResolver{&types.Auth{resp.JwtToken}}, nil
 }
 
 func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceCreamQuery }) (*IceCreamResultsResolver, error) {
@@ -79,6 +87,9 @@ func (r *Mutation) CreateIceCream(ctx context.Context, args struct{ Input *types
 	}
 
 	resp, err := clients.IceCream.Create(ctx, payload)
+	if err != nil {
+		return nil, err
+	}
 
 	productID := graphql.ID(resp.ProductId)
 

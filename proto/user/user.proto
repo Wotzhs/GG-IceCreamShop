@@ -9,4 +9,9 @@ package user;
 
 service User {
 	rpc Create (auth.Credentials) returns (google.protobuf.Empty);
+	rpc GetPasswordHash(auth.Credentials) returns (PasswordHash);
 };
+
+message PasswordHash {
+	string hash = 1;
+}

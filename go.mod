@@ -3,6 +3,7 @@ module GG-IceCreamShop
 go 1.14
 
 require (
+	github.com/SermoDigital/jose v0.9.2-0.20180104203859-803625baeddc
 	github.com/golang-migrate/migrate v3.5.4+incompatible // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/google/uuid v1.1.1 // indirect

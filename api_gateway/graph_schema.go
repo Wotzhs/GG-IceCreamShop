@@ -4,10 +4,9 @@ import (
 	"GG-IceCreamShop/api_gateway/resolvers"
 
 	graphql "github.com/graph-gophers/graphql-go"
-	"github.com/graph-gophers/graphql-go/relay"
 )
 
-var RelayHandler = &relay.Handler{
+var RelayHandler = &CustomRelay{
 	Schema: graphql.MustParseSchema(GraphSchema, &resolvers.RootResolver{}),
 }
 
@@ -18,7 +17,7 @@ var GraphSchema string = `
 	}
 
 	type Mutation {
-		createIceCream(input: IceCreamInput!): IceCream!
+		createIceCream(input: IceCreamInput!): IceCream
 		updateIceCream(id: ID!, input: IceCreamInput!): IceCream!
 		deleteIceCream(id: ID!): String
 		createUser(input: Credentials!): String

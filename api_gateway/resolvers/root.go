@@ -87,6 +87,9 @@ func (r *Mutation) CreateIceCream(ctx context.Context, args struct{ Input *types
 	}
 
 	resp, err := clients.IceCream.Create(ctx, payload)
+	if err != nil {
+		return nil, err
+	}
 
 	productID := graphql.ID(resp.ProductId)
 

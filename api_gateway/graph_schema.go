@@ -17,7 +17,7 @@ var GraphSchema string = `
 	}
 
 	type Mutation {
-		createIceCream(input: IceCreamInput!): IceCream!
+		createIceCream(input: IceCreamInput!): IceCream
 		updateIceCream(id: ID!, input: IceCreamInput!): IceCream!
 		deleteIceCream(id: ID!): String
 		createUser(input: Credentials!): String

@@ -5,6 +5,9 @@ import (
 	"proto/ice_cream"
 
 	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 type IceCreamService struct{}
@@ -30,6 +33,16 @@ func (s *IceCreamService) Get(ctx context.Context, req *ice_cream.IceCreamQuery)
 }
 
 func (s *IceCreamService) Create(ctx context.Context, req *ice_cream.IceCreamDetails) (*ice_cream.IceCreamDetails, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "%v", "unauthenticated access")
+	}
+
+	_, ok = md["email"]
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "%v", "unauthenticated access")
+	}
+
 	return &ice_cream.IceCreamDetails{
 		Id: "Hello World",
 	}, nil

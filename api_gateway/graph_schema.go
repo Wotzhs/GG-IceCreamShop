@@ -4,10 +4,9 @@ import (
 	"GG-IceCreamShop/api_gateway/resolvers"
 
 	graphql "github.com/graph-gophers/graphql-go"
-	"github.com/graph-gophers/graphql-go/relay"
 )
 
-var RelayHandler = &relay.Handler{
+var RelayHandler = &CustomRelay{
 	Schema: graphql.MustParseSchema(GraphSchema, &resolvers.RootResolver{}),
 }
 

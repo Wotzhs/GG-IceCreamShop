@@ -74,16 +74,31 @@ type Mutation struct{}
 
 func (r *Mutation) CreateIceCream(ctx context.Context, args struct{ Input *types.IceCream }) (*IceCreamResolver, error) {
 	payload := &ice_cream.IceCreamDetails{
-		Name:                  args.Input.Name,
-		ImageClosed:           args.Input.ImageClosed,
-		ImageOpen:             args.Input.ImageOpen,
-		Description:           args.Input.Description,
-		Story:                 args.Input.Story,
-		SourcingValues:        *args.Input.SourcingValues,
-		Ingredients:           *args.Input.Ingredients,
-		AllergyInfo:           *args.Input.AllergyInfo,
-		DietaryCertifications: *args.Input.DietaryCertifications,
-		ProductId:             string(*args.Input.ProductID),
+		Name:        args.Input.Name,
+		ImageClosed: args.Input.ImageClosed,
+		ImageOpen:   args.Input.ImageOpen,
+		Description: args.Input.Description,
+		Story:       args.Input.Story,
+	}
+
+	if args.Input.SourcingValues != nil {
+		payload.SourcingValues = *args.Input.SourcingValues
+	}
+
+	if args.Input.Ingredients != nil {
+		payload.Ingredients = *args.Input.Ingredients
+	}
+
+	if args.Input.AllergyInfo != nil {
+		payload.AllergyInfo = *args.Input.AllergyInfo
+	}
+
+	if args.Input.DietaryCertifications != nil {
+		payload.DietaryCertifications = *args.Input.DietaryCertifications
+	}
+
+	if args.Input.ProductID != nil {
+		payload.ProductId = string(*args.Input.ProductID)
 	}
 
 	resp, err := clients.IceCream.Create(ctx, payload)

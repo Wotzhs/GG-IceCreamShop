@@ -30,8 +30,8 @@ message IceCreamQuery {
 	string after = 2;
 	string id = 3;
 	string name = 4;
-	string sourcing_values = 5;
-	string ingredients = 6;
+	repeated string sourcing_values = 5;
+	repeated string ingredients = 6;
 	SortColumn sort_col = 7;
 	SortDir sort_dir = 8;
 }

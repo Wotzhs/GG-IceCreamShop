@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS ice_creams (
 	id BYTEA PRIMARY KEY,
-	name VARCHAR NOT NULL,
+	name VARCHAR UNIQUE NOT NULL,
 	image_closed VARCHAR NOT NULL,
 	image_open VARCHAR NOT NULL,
 	description VARCHAR NOT NULL,

@@ -1,8 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
+	"strings"
 	"time"
+
+	"proto/ice_cream"
 
 	"github.com/lib/pq"
 	"github.com/oklog/ulid"
@@ -12,11 +16,88 @@ var iceCreamService *IceCreamService
 
 type IceCreamService struct{}
 
-func (s *IceCreamService) GetIceCreams(iceCreams *[]IceCream) error {
+func (s *IceCreamService) GetIceCreamByID(ID ulid.ULID, iceCream *IceCream) error {
+	query := "SELECT * FROM ice_creams WHERE id = $1"
+	return db.QueryRow(query, ID).Scan(
+		&iceCream.ID,
+		&iceCream.Name,
+		&iceCream.ImageClosed,
+		&iceCream.ImageOpen,
+		&iceCream.Description,
+		&iceCream.Story,
+		pq.Array(&iceCream.SourcingValues),
+		pq.Array(&iceCream.Ingredients),
+		&iceCream.AllergyInfo,
+		&iceCream.DietaryCertifications,
+		&iceCream.ProductID,
+		&iceCream.CreatedBy,
+		&iceCream.UpdatedBy,
+		&iceCream.CreatedAt,
+		&iceCream.UpdatedAt,
+	)
+}
+
+func (s *IceCreamService) GetIceCreams(q *ice_cream.IceCreamQuery, iceCreams *[]IceCream) error {
 	baseQuery := "SELECT * FROM ice_creams\n"
-	sort := "ORDER BY id DESC\n"
-	limit := "LIMIT 10\n"
-	rows, err := db.Query(baseQuery + sort + limit)
+	defaultLimit := "LIMIT 10\n"
+
+	var queries []string
+	var variables []interface{}
+
+	if q.After != "" {
+		queries = append(queries, fmt.Sprintf("id < $%d", len(queries)+1))
+		ID, err := ulid.Parse(q.After)
+		if err != nil {
+			return err
+		}
+		variables = append(variables, ID)
+	}
+
+	if q.Name != "" {
+		queries = append(queries, fmt.Sprintf("name LIKE '%%' || $%d || '%%'", len(queries)+1))
+		variables = append(variables, q.Name)
+	}
+
+	if len(q.SourcingValues) > 0 {
+		queries = append(queries, fmt.Sprintf("sourcing_values @> $%d", len(queries)+1))
+		variables = append(variables, pq.Array(q.SourcingValues))
+	}
+
+	if len(q.Ingredients) > 0 {
+		queries = append(queries, fmt.Sprintf("ingredients @> $%d", len(queries)+1))
+		variables = append(variables, pq.Array(q.Ingredients))
+	}
+
+	query := baseQuery
+	if len(queries) > 0 {
+		query += "WHERE " + strings.Join(queries, " AND ") + "\n"
+	}
+
+	var sort string
+	switch q.SortCol {
+	case ice_cream.SortColumn_NAME:
+		sort = "ORDER BY name "
+	case ice_cream.SortColumn_CREATED_AT:
+		sort = "ORDER BY created_at "
+	case ice_cream.SortColumn_UPDATED_AT:
+		sort = "ORDER BY udpated_at "
+	}
+
+	if len(sort) > 0 {
+		if q.SortDir == ice_cream.SortDir_ASC {
+			sort += "asc\n"
+		} else {
+			sort += "desc\n"
+		}
+	}
+
+	limit := defaultLimit
+	if q.First != 0 {
+		limit = fmt.Sprintf("LIMIT $%d\n", len(variables)+1)
+		variables = append(variables, q.First)
+	}
+
+	rows, err := db.Query(query+sort+limit, variables...)
 	if err != nil {
 		return err
 	}

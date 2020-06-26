@@ -41,9 +41,26 @@ var GraphSchema string = `
 		product_id: ID
 	}
 
+	enum SortColumn {
+		NAME
+		CREATED_AT
+		UPDATED_AT
+	}
+
+	enum SortDirection {
+		ASC
+		DESC
+	}
+
 	input IceCreamQuery {
 		first: Int
 		after: ID
+		id: ID
+		name: String
+		sourcing_values: [String!]
+		ingredients: [String!]
+		sort_column: SortColumn
+		sort_direction: SortDirection
 	}
 
 	type Auth {

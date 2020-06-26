@@ -5,8 +5,14 @@ import (
 )
 
 type IceCreamQuery struct {
-	First *float64
-	After *graphql.ID
+	First          *float64
+	After          *graphql.ID
+	ID             *graphql.ID
+	Name           *string
+	SourcingValues *[]string
+	Ingredients    *[]string
+	SortColumn     *string
+	SortDirection  *string
 }
 
 type IceCream struct {

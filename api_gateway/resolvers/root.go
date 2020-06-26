@@ -4,6 +4,7 @@ import (
 	"GG-IceCreamShop/api_gateway/clients"
 	"GG-IceCreamShop/api_gateway/types"
 	"context"
+	"fmt"
 	"proto/auth"
 	"proto/ice_cream"
 
@@ -59,6 +60,22 @@ func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceC
 
 	if args.Query.Ingredients != nil {
 		payload.Ingredients = *args.Query.Ingredients
+	}
+
+	if args.Query.SortColumn != nil {
+		value, ok := ice_cream.SortColumn_value[*args.Query.SortColumn]
+		if !ok {
+			return nil, fmt.Errorf("sort_column value is not a valid enum")
+		}
+		payload.SortCol = ice_cream.SortColumn(value)
+	}
+
+	if args.Query.SortDirection != nil {
+		value, ok := ice_cream.SortDir_value[*args.Query.SortDirection]
+		if !ok {
+			return nil, fmt.Errorf("sort_direction value is not a valid enum")
+		}
+		payload.SortDir = ice_cream.SortDir(value)
 	}
 
 	resp, err := clients.IceCream.Get(ctx, payload)

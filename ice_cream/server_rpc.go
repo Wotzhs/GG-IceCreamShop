@@ -14,22 +14,43 @@ import (
 type IceCreamServerRPC struct{}
 
 func (s *IceCreamServerRPC) Get(ctx context.Context, req *ice_cream.IceCreamQuery) (*ice_cream.IceCreams, error) {
+	var iceCreams []IceCream
+	var totalCount int32
+	var hasNext bool
+	if err := iceCreamService.GetIceCreams(&iceCreams); err != nil {
+		return nil, status.Errorf(codes.Internal, "%v", err)
+	}
+
+	if err := iceCreamService.GetIceCreamsCount(&totalCount); err != nil {
+		return nil, status.Errorf(codes.Internal, "%v", err)
+	}
+
+	if err := iceCreamService.HasNextIceCreams(iceCreams[len(iceCreams)-1].ID, &hasNext); err != nil {
+		return nil, status.Errorf(codes.Internal, "%v", err)
+	}
+
+	iceCreamsResp := []*ice_cream.IceCreamDetails{}
+	for _, iceCream := range iceCreams {
+		iceCreamDetails := &ice_cream.IceCreamDetails{
+			Id:                    iceCream.ID.String(),
+			Name:                  iceCream.Name,
+			ImageClosed:           iceCream.ImageClosed,
+			ImageOpen:             iceCream.ImageOpen,
+			Description:           iceCream.Description,
+			Story:                 iceCream.Story,
+			SourcingValues:        iceCream.SourcingValues,
+			Ingredients:           iceCream.Ingredients,
+			AllergyInfo:           iceCream.AllergyInfo,
+			DietaryCertifications: iceCream.DietaryCertifications,
+			ProductId:             iceCream.ProductID,
+		}
+		iceCreamsResp = append(iceCreamsResp, iceCreamDetails)
+	}
+
 	return &ice_cream.IceCreams{
-		IceCreams: []*ice_cream.IceCreamDetails{
-			&ice_cream.IceCreamDetails{
-				Id:                    "Hello World",
-				Name:                  "Hello World",
-				ImageClosed:           "Hello World",
-				ImageOpen:             "Hello World",
-				Description:           "Hello World",
-				Story:                 "Hello World",
-				SourcingValues:        []string{"Hello World"},
-				Ingredients:           []string{"Hello World"},
-				AllergyInfo:           "Hello World",
-				DietaryCertifications: "Hello World",
-				ProductId:             "Hello World",
-			},
-		},
+		IceCreams:  iceCreamsResp,
+		TotalCount: totalCount,
+		HasNext:    hasNext,
 	}, nil
 }
 

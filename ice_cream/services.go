@@ -12,6 +12,60 @@ var iceCreamService *IceCreamService
 
 type IceCreamService struct{}
 
+func (s *IceCreamService) GetIceCreams(iceCreams *[]IceCream) error {
+	baseQuery := "SELECT * FROM ice_creams\n"
+	sort := "ORDER BY id DESC\n"
+	limit := "LIMIT 10\n"
+	rows, err := db.Query(baseQuery + sort + limit)
+	if err != nil {
+		return err
+	}
+
+	for rows.Next() {
+		iceCream := IceCream{}
+		err := rows.Scan(
+			&iceCream.ID,
+			&iceCream.Name,
+			&iceCream.ImageClosed,
+			&iceCream.ImageOpen,
+			&iceCream.Description,
+			&iceCream.Story,
+			pq.Array(&iceCream.SourcingValues),
+			pq.Array(&iceCream.Ingredients),
+			&iceCream.AllergyInfo,
+			&iceCream.DietaryCertifications,
+			&iceCream.ProductID,
+			&iceCream.CreatedBy,
+			&iceCream.UpdatedBy,
+			&iceCream.CreatedAt,
+			&iceCream.UpdatedAt,
+		)
+
+		if err != nil {
+			return err
+		}
+		*iceCreams = append(*iceCreams, iceCream)
+	}
+
+	return nil
+}
+
+func (s *IceCreamService) GetIceCreamsCount(totalCount *int32) error {
+	totalCountQuery := "SELECT count(id) from ice_creams;"
+	if err := db.QueryRow(totalCountQuery).Scan(totalCount); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *IceCreamService) HasNextIceCreams(lastID ulid.ULID, hasNext *bool) error {
+	hasNextQuery := "SELECT count(id)>0 from ice_creams WHERE id < $1"
+	if err := db.QueryRow(hasNextQuery, lastID).Scan(hasNext); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (s *IceCreamService) CreateIceCream(iceCream *IceCream) error {
 	query := `
 		INSERT INTO ice_creams (

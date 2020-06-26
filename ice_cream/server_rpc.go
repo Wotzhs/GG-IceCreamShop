@@ -137,5 +137,10 @@ func (s *IceCreamServerRPC) Update(ctx context.Context, req *ice_cream.IceCreamD
 }
 
 func (s *IceCreamServerRPC) Delete(ctx context.Context, req *ice_cream.IceCreamDetails) (*empty.Empty, error) {
-	return &empty.Empty{}, nil
+	ID, err := ulid.Parse(req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "%", err)
+	}
+
+	return &empty.Empty{}, iceCreamService.DeleteIceCream(&IceCream{ID: ID})
 }

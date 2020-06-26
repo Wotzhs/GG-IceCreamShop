@@ -111,3 +111,9 @@ func (s *IceCreamService) UpdateIceCream(iceCream *IceCream) error {
 
 	return err
 }
+
+func (s *IceCreamService) DeleteIceCream(iceCream *IceCream) error {
+	query := `DELETE from ice_creams WHERE id = $1`
+	_, err := db.Exec(query, iceCream.ID)
+	return err
+}

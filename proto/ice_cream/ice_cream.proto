@@ -13,9 +13,27 @@ service IceCream {
 	rpc Delete(IceCreamDetails) returns (google.protobuf.Empty);
 }
 
+enum SortColumn {
+	DEFAULT_COLUMN = 0;
+	NAME = 1;
+	CREATED_AT = 2;
+	UPDATED_AT = 3;
+}
+
+enum SortDir {
+	DESC = 0;
+	ASC = 1;
+}
+
 message IceCreamQuery {
 	int32 first = 1;
 	string after = 2;
+	string id = 3;
+	string name = 4;
+	string sourcing_values = 5;
+	string ingredients = 6;
+	SortColumn sort_col = 7;
+	SortDir sort_dir = 8;
 }
 
 message IceCreamDetails {

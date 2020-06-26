@@ -13,7 +13,7 @@ var iceCreamService *IceCreamService
 
 type IceCreamService struct{}
 
-func (s *IceCreamService) CreateIceam(iceCream *IceCream) error {
+func (s *IceCreamService) CreateIceCream(iceCream *IceCream) error {
 	query := `
 		INSERT INTO ice_creams (
 			id,

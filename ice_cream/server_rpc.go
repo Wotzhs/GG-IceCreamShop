@@ -62,7 +62,7 @@ func (s *IceCreamServerRPC) Create(ctx context.Context, req *ice_cream.IceCreamD
 		return nil, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	if err := iceCreamService.CreateIceam(iceCream); err != nil {
+	if err := iceCreamService.CreateIceCream(iceCream); err != nil {
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 

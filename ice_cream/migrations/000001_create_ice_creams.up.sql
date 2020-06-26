@@ -14,4 +14,7 @@ CREATE TABLE IF NOT EXISTS ice_creams (
 	updated_by vARCHAR,
 	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 	updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-)
+);
+
+CREATE INDEX ice_cream_sourcing_values_idx on ice_creams USING GIN (sourcing_values);
+CREATE INDEX ice_cream_ingredients_idx on ice_creams USING GIN (ingredients);

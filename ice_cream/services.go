@@ -1,59 +1,59 @@
 package main
 
 import (
-	"context"
-	"proto/ice_cream"
+	"fmt"
+	"math/rand"
+	"strings"
+	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
+	"github.com/oklog/ulid"
 )
+
+var iceCreamService *IceCreamService
 
 type IceCreamService struct{}
 
-func (s *IceCreamService) Get(ctx context.Context, req *ice_cream.IceCreamQuery) (*ice_cream.IceCreams, error) {
-	return &ice_cream.IceCreams{
-		IceCreams: []*ice_cream.IceCreamDetails{
-			&ice_cream.IceCreamDetails{
-				Id:                    "Hello World",
-				Name:                  "Hello World",
-				ImageClosed:           "Hello World",
-				ImageOpen:             "Hello World",
-				Description:           "Hello World",
-				Story:                 "Hello World",
-				SourcingValues:        []string{"Hello World"},
-				Ingredients:           []string{"Hello World"},
-				AllergyInfo:           "Hello World",
-				DietaryCertifications: "Hello World",
-				ProductId:             "Hello World",
-			},
-		},
-	}, nil
-}
+func (s *IceCreamService) CreateIceam(iceCream *IceCream) error {
+	query := `
+		INSERT INTO ice_creams (
+			id,
+			name,
+			image_closed,
+			image_open,
+			description,
+			story,
+			sourcing_values,
+			ingredients,
+			allergy_info,
+			dietary_certifications,
+			product_id,
+			created_by,
+			updated_by
+		)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+		RETURNING id
+	`
 
-func (s *IceCreamService) Create(ctx context.Context, req *ice_cream.IceCreamDetails) (*ice_cream.IceCreamDetails, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, status.Errorf(codes.Unauthenticated, "%v", "unauthenticated access")
-	}
+	t := time.Unix(time.Now().Unix(), time.Now().UnixNano())
+	entropy := ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)
+	id := ulid.MustNew(ulid.Timestamp(t), entropy)
 
-	_, ok = md["email"]
-	if !ok {
-		return nil, status.Errorf(codes.Unauthenticated, "%v", "unauthenticated access")
-	}
+	err := db.QueryRow(
+		query,
+		id,
+		iceCream.Name,
+		iceCream.ImageClosed,
+		iceCream.ImageOpen,
+		iceCream.Description,
+		iceCream.Story,
+		fmt.Sprintf("{%s}", strings.Join(iceCream.SourcingValues, ",")),
+		fmt.Sprintf("{%s}", strings.Join(iceCream.Ingredients, ",")),
+		iceCream.AllergyInfo,
+		iceCream.DietaryCertifications,
+		iceCream.ProductID,
+		iceCream.CreatedBy,
+		iceCream.UpdatedBy,
+	).Scan(&iceCream.ID)
 
-	return &ice_cream.IceCreamDetails{
-		Id: "Hello World",
-	}, nil
-}
-
-func (s *IceCreamService) Update(ctx context.Context, req *ice_cream.IceCreamDetails) (*ice_cream.IceCreamDetails, error) {
-	return &ice_cream.IceCreamDetails{
-		Id: "Hello World",
-	}, nil
-}
-
-func (s *IceCreamService) Delete(ctx context.Context, req *ice_cream.IceCreamDetails) (*empty.Empty, error) {
-	return &empty.Empty{}, nil
+	return err
 }

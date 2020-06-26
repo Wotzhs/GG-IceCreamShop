@@ -161,6 +161,9 @@ func (r *Mutation) UpdateIceCream(ctx context.Context, args UpdateIceCreamArgs) 
 	}
 
 	resp, err := clients.IceCream.Update(ctx, payload)
+	if err != nil {
+		return nil, err
+	}
 
 	productID := graphql.ID(resp.ProductId)
 

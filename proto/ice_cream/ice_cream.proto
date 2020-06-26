@@ -34,4 +34,6 @@ message IceCreamDetails {
 
 message IceCreams {
 	repeated IceCreamDetails ice_creams = 1;
+	int32 total_count = 2;
+	bool has_next = 3;
 }

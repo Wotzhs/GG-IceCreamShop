@@ -46,6 +46,9 @@ func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceC
 	}
 
 	resp, err := clients.IceCream.Get(ctx, payload)
+	if err != nil {
+		return nil, err
+	}
 
 	iceCreamResolvers := []*IceCreamResolver{}
 
@@ -67,7 +70,7 @@ func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceC
 		iceCreamResolvers = append(iceCreamResolvers, &IceCreamResolver{&iceCreamType})
 	}
 
-	return &IceCreamResultsResolver{&iceCreamResolvers, 10, false}, err
+	return &IceCreamResultsResolver{&iceCreamResolvers, resp.TotalCount, resp.HasNext}, err
 }
 
 type Mutation struct{}

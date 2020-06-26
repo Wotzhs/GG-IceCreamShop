@@ -8,6 +8,15 @@ services:
       - user_db:/var/lib/postgresql/data
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
+  ice_cream_db:
+    image: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - ice_cream_db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_HOST_AUTH_METHOD: trust
 
 volumes:
   user_db:
+  ice_cream_db:

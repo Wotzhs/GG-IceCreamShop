@@ -40,9 +40,13 @@ func (r *Query) Login(ctx context.Context, args CredentialsArgs) (*AuthResolver,
 }
 
 func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceCreamQuery }) (*IceCreamResultsResolver, error) {
-	payload := &ice_cream.IceCreamQuery{
-		First: int32(*args.Query.First),
-		After: string(*args.Query.After),
+	payload := &ice_cream.IceCreamQuery{}
+	if args.Query.First != nil {
+		payload.First = int32(*args.Query.First)
+	}
+
+	if args.Query.After != nil {
+		payload.After = string(*args.Query.After)
 	}
 
 	resp, err := clients.IceCream.Get(ctx, payload)

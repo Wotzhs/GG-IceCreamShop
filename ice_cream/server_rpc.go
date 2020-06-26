@@ -17,7 +17,7 @@ func (s *IceCreamServerRPC) Get(ctx context.Context, req *ice_cream.IceCreamQuer
 	var iceCreams []IceCream
 	var totalCount int32
 	var hasNext bool
-	if err := iceCreamService.GetIceCreams(&iceCreams); err != nil {
+	if err := iceCreamService.GetIceCreams(req, &iceCreams); err != nil {
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 
@@ -25,8 +25,10 @@ func (s *IceCreamServerRPC) Get(ctx context.Context, req *ice_cream.IceCreamQuer
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 
-	if err := iceCreamService.HasNextIceCreams(iceCreams[len(iceCreams)-1].ID, &hasNext); err != nil {
-		return nil, status.Errorf(codes.Internal, "%v", err)
+	if len(iceCreams) > 0 {
+		if err := iceCreamService.HasNextIceCreams(iceCreams[len(iceCreams)-1].ID, &hasNext); err != nil {
+			return nil, status.Errorf(codes.Internal, "%v", err)
+		}
 	}
 
 	iceCreamsResp := []*ice_cream.IceCreamDetails{}

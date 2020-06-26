@@ -53,6 +53,10 @@ func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceC
 		payload.Name = string(*args.Query.Name)
 	}
 
+	if args.Query.SourcingValues != nil {
+		payload.SourcingValues = *args.Query.SourcingValues
+	}
+
 	resp, err := clients.IceCream.Get(ctx, payload)
 	if err != nil {
 		return nil, err

@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"math/rand"
-	"strings"
 	"time"
 
+	"github.com/lib/pq"
 	"github.com/oklog/ulid"
 )
 
@@ -46,14 +45,69 @@ func (s *IceCreamService) CreateIceCream(iceCream *IceCream) error {
 		iceCream.ImageOpen,
 		iceCream.Description,
 		iceCream.Story,
-		fmt.Sprintf("{%s}", strings.Join(iceCream.SourcingValues, ",")),
-		fmt.Sprintf("{%s}", strings.Join(iceCream.Ingredients, ",")),
+		pq.Array(iceCream.SourcingValues),
+		pq.Array(iceCream.Ingredients),
 		iceCream.AllergyInfo,
 		iceCream.DietaryCertifications,
 		iceCream.ProductID,
 		iceCream.CreatedBy,
 		iceCream.UpdatedBy,
 	).Scan(&iceCream.ID)
+
+	return err
+}
+
+func (s *IceCreamService) UpdateIceCream(iceCream *IceCream) error {
+	query := `
+		UPDATE ice_creams SET
+			name = $1,
+			image_closed = $2,
+			image_open = $3,
+			description = $4,
+			story = $5,
+			sourcing_values = $6,
+			ingredients = $7,
+			allergy_info = $8,
+			dietary_certifications = $9,
+			product_id = $10,
+			updated_by = $11,
+			updated_at = $12
+		WHERE ID = $13
+		RETURNING *
+	`
+
+	err := db.QueryRow(
+		query,
+		iceCream.Name,
+		iceCream.ImageClosed,
+		iceCream.ImageOpen,
+		iceCream.Description,
+		iceCream.Story,
+		pq.Array(iceCream.SourcingValues),
+		pq.Array(iceCream.Ingredients),
+		iceCream.AllergyInfo,
+		iceCream.DietaryCertifications,
+		iceCream.ProductID,
+		iceCream.UpdatedBy,
+		time.Now(),
+		iceCream.ID,
+	).Scan(
+		&iceCream.ID,
+		&iceCream.Name,
+		&iceCream.ImageClosed,
+		&iceCream.ImageOpen,
+		&iceCream.Description,
+		&iceCream.Story,
+		pq.Array(&iceCream.SourcingValues),
+		pq.Array(&iceCream.Ingredients),
+		&iceCream.AllergyInfo,
+		&iceCream.DietaryCertifications,
+		&iceCream.ProductID,
+		&iceCream.CreatedBy,
+		&iceCream.UpdatedBy,
+		&iceCream.CreatedAt,
+		&iceCream.UpdatedAt,
+	)
 
 	return err
 }

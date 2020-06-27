@@ -15,11 +15,11 @@ import (
 	"github.com/oklog/ulid"
 )
 
-var IceCream *IceCreamService
+var IceCream *iceCreamService
 
-type IceCreamService struct{}
+type iceCreamService struct{}
 
-func (s *IceCreamService) GetIceCreamByID(ID ulid.ULID, iceCream *models.IceCream) error {
+func (s *iceCreamService) GetIceCreamByID(ID ulid.ULID, iceCream *models.IceCream) error {
 	query := "SELECT * FROM ice_creams WHERE id = $1"
 	return db.Conn.QueryRow(query, ID).Scan(
 		&iceCream.ID,
@@ -40,7 +40,7 @@ func (s *IceCreamService) GetIceCreamByID(ID ulid.ULID, iceCream *models.IceCrea
 	)
 }
 
-func (s *IceCreamService) GetIceCreams(q *ice_cream.IceCreamQuery, iceCreams *[]models.IceCream) error {
+func (s *iceCreamService) GetIceCreams(q *ice_cream.IceCreamQuery, iceCreams *[]models.IceCream) error {
 	baseQuery := "SELECT * FROM ice_creams\n"
 	defaultLimit := "LIMIT 10\n"
 
@@ -134,7 +134,7 @@ func (s *IceCreamService) GetIceCreams(q *ice_cream.IceCreamQuery, iceCreams *[]
 	return nil
 }
 
-func (s *IceCreamService) GetIceCreamsCount(totalCount *int32) error {
+func (s *iceCreamService) GetIceCreamsCount(totalCount *int32) error {
 	totalCountQuery := "SELECT count(id) from ice_creams;"
 	if err := db.Conn.QueryRow(totalCountQuery).Scan(totalCount); err != nil {
 		return err
@@ -142,7 +142,7 @@ func (s *IceCreamService) GetIceCreamsCount(totalCount *int32) error {
 	return nil
 }
 
-func (s *IceCreamService) HasNextIceCreams(lastID ulid.ULID, hasNext *bool) error {
+func (s *iceCreamService) HasNextIceCreams(lastID ulid.ULID, hasNext *bool) error {
 	hasNextQuery := "SELECT count(id)>0 from ice_creams WHERE id < $1"
 	if err := db.Conn.QueryRow(hasNextQuery, lastID).Scan(hasNext); err != nil {
 		return err
@@ -150,7 +150,7 @@ func (s *IceCreamService) HasNextIceCreams(lastID ulid.ULID, hasNext *bool) erro
 	return nil
 }
 
-func (s *IceCreamService) CreateIceCream(iceCream *models.IceCream) error {
+func (s *iceCreamService) CreateIceCream(iceCream *models.IceCream) error {
 	query := `
 		INSERT INTO ice_creams (
 			id,
@@ -195,7 +195,7 @@ func (s *IceCreamService) CreateIceCream(iceCream *models.IceCream) error {
 	return err
 }
 
-func (s *IceCreamService) UpdateIceCream(iceCream *models.IceCream) error {
+func (s *iceCreamService) UpdateIceCream(iceCream *models.IceCream) error {
 	query := `
 		UPDATE ice_creams SET
 			name = $1,
@@ -250,8 +250,81 @@ func (s *IceCreamService) UpdateIceCream(iceCream *models.IceCream) error {
 	return err
 }
 
-func (s *IceCreamService) DeleteIceCream(iceCream *models.IceCream) error {
+func (s *iceCreamService) DeleteIceCream(iceCream *models.IceCream) error {
 	query := `DELETE from ice_creams WHERE id = $1`
 	_, err := db.Conn.Exec(query, iceCream.ID)
 	return err
+}
+
+func (s *iceCreamService) Import(iceCreams []models.IceCream) (int64, error) {
+	query := `
+		INSERT INTO ice_creams (
+			id,
+			name,
+			image_closed,
+			image_open,
+			description,
+			story,
+			sourcing_values,
+			ingredients,
+			allergy_info,
+			dietary_certifications,
+			product_id,
+			created_by,
+			updated_by
+		)
+		VALUES
+
+	`
+	var variables []interface{}
+	cols := 13
+
+	for i, iceCream := range iceCreams {
+		t := time.Unix(time.Now().Unix(), time.Now().UnixNano())
+		entropy := ulid.Monotonic(rand.New(rand.NewSource(t.UnixNano())), 0)
+		id := ulid.MustNew(ulid.Timestamp(t), entropy)
+
+		query += fmt.Sprintf(
+			"($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),\n",
+			cols*i+1,
+			cols*i+2,
+			cols*i+3,
+			cols*i+4,
+			cols*i+5,
+			cols*i+6,
+			cols*i+7,
+			cols*i+8,
+			cols*i+9,
+			cols*i+10,
+			cols*i+11,
+			cols*i+12,
+			cols*i+13,
+		)
+		variables = append(
+			variables,
+			id,
+			iceCream.Name,
+			iceCream.ImageClosed,
+			iceCream.ImageOpen,
+			iceCream.Description,
+			iceCream.Story,
+			pq.Array(iceCream.SourcingValues),
+			pq.Array(iceCream.Ingredients),
+			iceCream.AllergyInfo,
+			iceCream.DietaryCertifications,
+			iceCream.ProductID,
+			"admin",
+			"admin",
+		)
+	}
+
+	query = strings.TrimSuffix(query, ",\n")
+	query += "\nON CONFLICT (name) DO NOTHING"
+
+	res, err := db.Conn.Exec(query, variables...)
+	if err != nil {
+		return 0, err
+	}
+
+	return res.RowsAffected()
 }

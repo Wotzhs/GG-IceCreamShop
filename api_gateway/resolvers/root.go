@@ -4,6 +4,7 @@ import (
 	"GG-IceCreamShop/api_gateway/clients"
 	"GG-IceCreamShop/api_gateway/types"
 	"context"
+	"fmt"
 	"proto/auth"
 	"proto/ice_cream"
 
@@ -40,12 +41,47 @@ func (r *Query) Login(ctx context.Context, args CredentialsArgs) (*AuthResolver,
 }
 
 func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceCreamQuery }) (*IceCreamResultsResolver, error) {
-	payload := &ice_cream.IceCreamQuery{
-		First: int32(*args.Query.First),
-		After: string(*args.Query.After),
+	payload := &ice_cream.IceCreamQuery{}
+	if args.Query.First != nil {
+		payload.First = int32(*args.Query.First)
+	}
+
+	if args.Query.After != nil {
+		payload.After = string(*args.Query.After)
+	}
+
+	if args.Query.Name != nil {
+		payload.Name = string(*args.Query.Name)
+	}
+
+	if args.Query.SourcingValues != nil {
+		payload.SourcingValues = *args.Query.SourcingValues
+	}
+
+	if args.Query.Ingredients != nil {
+		payload.Ingredients = *args.Query.Ingredients
+	}
+
+	if args.Query.SortColumn != nil {
+		value, ok := ice_cream.SortColumn_value[*args.Query.SortColumn]
+		if !ok {
+			return nil, fmt.Errorf("sort_column value is not a valid enum")
+		}
+		payload.SortCol = ice_cream.SortColumn(value)
+	}
+
+	if args.Query.SortDirection != nil {
+		value, ok := ice_cream.SortDir_value[*args.Query.SortDirection]
+		if !ok {
+			return nil, fmt.Errorf("sort_direction value is not a valid enum")
+		}
+		payload.SortDir = ice_cream.SortDir(value)
 	}
 
 	resp, err := clients.IceCream.Get(ctx, payload)
+	if err != nil {
+		return nil, err
+	}
 
 	iceCreamResolvers := []*IceCreamResolver{}
 
@@ -67,23 +103,64 @@ func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceC
 		iceCreamResolvers = append(iceCreamResolvers, &IceCreamResolver{&iceCreamType})
 	}
 
-	return &IceCreamResultsResolver{&iceCreamResolvers, 10, false}, err
+	return &IceCreamResultsResolver{&iceCreamResolvers, resp.TotalCount, resp.HasNext}, err
+}
+
+func (r *Query) GetIceCreamById(ctx context.Context, args struct{ ID graphql.ID }) (*IceCreamResolver, error) {
+	payload := &ice_cream.IceCreamQuery{Id: string(args.ID)}
+	resp, err := clients.IceCream.GetById(ctx, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	productID := graphql.ID(resp.ProductId)
+
+	iceCream := &types.IceCream{
+		ID:                    graphql.ID(resp.Id),
+		Name:                  resp.Name,
+		ImageClosed:           resp.ImageClosed,
+		ImageOpen:             resp.ImageOpen,
+		Description:           resp.Description,
+		Story:                 resp.Story,
+		SourcingValues:        &resp.SourcingValues,
+		Ingredients:           &resp.Ingredients,
+		AllergyInfo:           &resp.AllergyInfo,
+		DietaryCertifications: &resp.DietaryCertifications,
+		ProductID:             &productID,
+	}
+
+	return &IceCreamResolver{iceCream}, nil
 }
 
 type Mutation struct{}
 
 func (r *Mutation) CreateIceCream(ctx context.Context, args struct{ Input *types.IceCream }) (*IceCreamResolver, error) {
 	payload := &ice_cream.IceCreamDetails{
-		Name:                  args.Input.Name,
-		ImageClosed:           args.Input.ImageClosed,
-		ImageOpen:             args.Input.ImageOpen,
-		Description:           args.Input.Description,
-		Story:                 args.Input.Story,
-		SourcingValues:        *args.Input.SourcingValues,
-		Ingredients:           *args.Input.Ingredients,
-		AllergyInfo:           *args.Input.AllergyInfo,
-		DietaryCertifications: *args.Input.DietaryCertifications,
-		ProductId:             string(*args.Input.ProductID),
+		Name:        args.Input.Name,
+		ImageClosed: args.Input.ImageClosed,
+		ImageOpen:   args.Input.ImageOpen,
+		Description: args.Input.Description,
+		Story:       args.Input.Story,
+	}
+
+	if args.Input.SourcingValues != nil {
+		payload.SourcingValues = *args.Input.SourcingValues
+	}
+
+	if args.Input.Ingredients != nil {
+		payload.Ingredients = *args.Input.Ingredients
+	}
+
+	if args.Input.AllergyInfo != nil {
+		payload.AllergyInfo = *args.Input.AllergyInfo
+	}
+
+	if args.Input.DietaryCertifications != nil {
+		payload.DietaryCertifications = *args.Input.DietaryCertifications
+	}
+
+	if args.Input.ProductID != nil {
+		payload.ProductId = string(*args.Input.ProductID)
 	}
 
 	resp, err := clients.IceCream.Create(ctx, payload)
@@ -117,20 +194,38 @@ type UpdateIceCreamArgs struct {
 
 func (r *Mutation) UpdateIceCream(ctx context.Context, args UpdateIceCreamArgs) (*IceCreamResolver, error) {
 	payload := &ice_cream.IceCreamDetails{
-		Id:                    string(args.ID),
-		Name:                  args.Input.Name,
-		ImageClosed:           args.Input.ImageClosed,
-		ImageOpen:             args.Input.ImageOpen,
-		Description:           args.Input.Description,
-		Story:                 args.Input.Story,
-		SourcingValues:        *args.Input.SourcingValues,
-		Ingredients:           *args.Input.Ingredients,
-		AllergyInfo:           *args.Input.AllergyInfo,
-		DietaryCertifications: *args.Input.DietaryCertifications,
-		ProductId:             string(*args.Input.ProductID),
+		Id:          string(args.ID),
+		Name:        args.Input.Name,
+		ImageClosed: args.Input.ImageClosed,
+		ImageOpen:   args.Input.ImageOpen,
+		Description: args.Input.Description,
+		Story:       args.Input.Story,
+	}
+
+	if args.Input.SourcingValues != nil {
+		payload.SourcingValues = *args.Input.SourcingValues
+	}
+
+	if args.Input.Ingredients != nil {
+		payload.Ingredients = *args.Input.Ingredients
+	}
+
+	if args.Input.AllergyInfo != nil {
+		payload.AllergyInfo = *args.Input.AllergyInfo
+	}
+
+	if args.Input.DietaryCertifications != nil {
+		payload.DietaryCertifications = *args.Input.DietaryCertifications
+	}
+
+	if args.Input.ProductID != nil {
+		payload.ProductId = string(*args.Input.ProductID)
 	}
 
 	resp, err := clients.IceCream.Update(ctx, payload)
+	if err != nil {
+		return nil, err
+	}
 
 	productID := graphql.ID(resp.ProductId)
 

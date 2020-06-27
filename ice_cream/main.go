@@ -30,8 +30,8 @@ func main() {
 
 	opts := []grpc.ServerOption{chainedUnaryInterceptors}
 	server := grpc.NewServer(opts...)
-	iceCreamService := &IceCreamService{}
-	ice_cream.RegisterIceCreamServer(server, iceCreamService)
+	iceCreamServerRPC := &IceCreamServerRPC{}
+	ice_cream.RegisterIceCreamServer(server, iceCreamServerRPC)
 
 	go func() {
 		if err := server.Serve(listener); err != nil {

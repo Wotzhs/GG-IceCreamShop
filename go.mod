@@ -10,6 +10,7 @@ require (
 	github.com/graph-gophers/graphql-go v0.0.0-20200622220639-c1d9693c95a6
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0 // indirect
 	github.com/lib/pq v1.7.0 // indirect
+	github.com/oklog/ulid v1.3.1 // indirect
 	google.golang.org/grpc v1.29.1
 	google.golang.org/protobuf v1.24.0
 	proto/auth v0.0.0-00010101000000-000000000000

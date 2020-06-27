@@ -14,6 +14,7 @@ var GraphSchema string = `
 	type Query {
 		login(input: Credentials!): Auth!
 		getIceCreams(query: IceCreamQuery): IceCreamResults!
+		getIceCreamById(id: ID!): IceCream
 	}
 
 	type Mutation {
@@ -41,9 +42,25 @@ var GraphSchema string = `
 		product_id: ID
 	}
 
+	enum SortColumn {
+		NAME
+		CREATED_AT
+		UPDATED_AT
+	}
+
+	enum SortDirection {
+		ASC
+		DESC
+	}
+
 	input IceCreamQuery {
 		first: Int
 		after: ID
+		name: String
+		sourcing_values: [String!]
+		ingredients: [String!]
+		sort_column: SortColumn
+		sort_direction: SortDirection
 	}
 
 	type Auth {

@@ -9,6 +9,7 @@ GraphQL + gRPC Ice Cream Shop
 	+ [Setup DB Migration Tool](#migration)
 2. [Getting Started](#getting-started)
 	+ [Running Migrations](#running-migrations)
+3. [Importing Ice Creams JSON](#import)
 
 ### <a name="setup">Setup</a>
 
@@ -39,3 +40,17 @@ To reset the db, one can use the following command:
 ```shell
 migrate -database "$DB_URL" drop
 ```
+
+### <a name="import">Importing Ice Creams JSON</a>
+
+The ice icream microservice has the import cli tool included in `cmd/import/main.go`. Presently, it only accepts a `-url` flag and the JSON has to conform to the schema as shown in the <a href="https://gist.githubusercontent.com/penmanglewood/f264e8d926b4c4a9926aa1de8fdb509a/raw/992f3c8a519ecd3d947bc48627ffefcf947f80bd/icecream.json" target="_blank">sample ice creams json</a>.
+
+**Sample invocation**
+From the ice cream microservice root dir:
+```shell
+go run cmd/import/main.go -url http://somehost/somejson.json
+```
+
+The import command is an idempotent operation, ice creams that are already exists wil be skipped.
+
+*Note: If the `-url` flag is not supplied, it will default to the sample ice creams json.*

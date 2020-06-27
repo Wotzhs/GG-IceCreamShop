@@ -1,8 +1,11 @@
-package main
+package internal
 
 import (
 	"context"
 	"proto/ice_cream"
+
+	"GG-IceCreamShop/ice_cream/internal/models"
+	"GG-IceCreamShop/ice_cream/internal/services"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/oklog/ulid"
@@ -14,19 +17,19 @@ import (
 type IceCreamServerRPC struct{}
 
 func (s *IceCreamServerRPC) Get(ctx context.Context, req *ice_cream.IceCreamQuery) (*ice_cream.IceCreams, error) {
-	var iceCreams []IceCream
+	var iceCreams []models.IceCream
 	var totalCount int32
 	var hasNext bool
-	if err := iceCreamService.GetIceCreams(req, &iceCreams); err != nil {
+	if err := services.IceCream.GetIceCreams(req, &iceCreams); err != nil {
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 
-	if err := iceCreamService.GetIceCreamsCount(&totalCount); err != nil {
+	if err := services.IceCream.GetIceCreamsCount(&totalCount); err != nil {
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 
 	if len(iceCreams) > 0 {
-		if err := iceCreamService.HasNextIceCreams(iceCreams[len(iceCreams)-1].ID, &hasNext); err != nil {
+		if err := services.IceCream.HasNextIceCreams(iceCreams[len(iceCreams)-1].ID, &hasNext); err != nil {
 			return nil, status.Errorf(codes.Internal, "%v", err)
 		}
 	}
@@ -57,13 +60,13 @@ func (s *IceCreamServerRPC) Get(ctx context.Context, req *ice_cream.IceCreamQuer
 }
 
 func (s *IceCreamServerRPC) GetById(ctx context.Context, req *ice_cream.IceCreamQuery) (*ice_cream.IceCreamDetails, error) {
-	var iceCream IceCream
+	var iceCream models.IceCream
 	ID, err := ulid.Parse(req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	if err := iceCreamService.GetIceCreamByID(ID, &iceCream); err != nil {
+	if err := services.IceCream.GetIceCreamByID(ID, &iceCream); err != nil {
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 
@@ -93,7 +96,7 @@ func (s *IceCreamServerRPC) Create(ctx context.Context, req *ice_cream.IceCreamD
 		return nil, status.Errorf(codes.Unauthenticated, "%v", "unauthenticated access")
 	}
 
-	iceCream := &IceCream{
+	iceCream := &models.IceCream{
 		Name:                  req.Name,
 		ImageClosed:           req.ImageClosed,
 		ImageOpen:             req.ImageOpen,
@@ -112,7 +115,7 @@ func (s *IceCreamServerRPC) Create(ctx context.Context, req *ice_cream.IceCreamD
 		return nil, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	if err := iceCreamService.CreateIceCream(iceCream); err != nil {
+	if err := services.IceCream.CreateIceCream(iceCream); err != nil {
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 
@@ -147,7 +150,7 @@ func (s *IceCreamServerRPC) Update(ctx context.Context, req *ice_cream.IceCreamD
 		return nil, status.Errorf(codes.InvalidArgument, "%", err)
 	}
 
-	iceCream := &IceCream{
+	iceCream := &models.IceCream{
 		ID:                    ID,
 		Name:                  req.Name,
 		ImageClosed:           req.ImageClosed,
@@ -166,7 +169,7 @@ func (s *IceCreamServerRPC) Update(ctx context.Context, req *ice_cream.IceCreamD
 		return nil, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	if err := iceCreamService.UpdateIceCream(iceCream); err != nil {
+	if err := services.IceCream.UpdateIceCream(iceCream); err != nil {
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 
@@ -191,5 +194,5 @@ func (s *IceCreamServerRPC) Delete(ctx context.Context, req *ice_cream.IceCreamD
 		return nil, status.Errorf(codes.InvalidArgument, "%", err)
 	}
 
-	return &empty.Empty{}, iceCreamService.DeleteIceCream(&IceCream{ID: ID})
+	return &empty.Empty{}, services.IceCream.DeleteIceCream(&models.IceCream{ID: ID})
 }

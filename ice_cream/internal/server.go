@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"context"
@@ -22,7 +22,7 @@ func init() {
 	}
 }
 
-func main() {
+func StartServer() {
 	listener, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("failed to listen on port %s", port)

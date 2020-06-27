@@ -106,6 +106,32 @@ func (r *Query) GetIceCreams(ctx context.Context, args struct{ Query *types.IceC
 	return &IceCreamResultsResolver{&iceCreamResolvers, resp.TotalCount, resp.HasNext}, err
 }
 
+func (r *Query) GetIceCreamById(ctx context.Context, args struct{ ID graphql.ID }) (*IceCreamResolver, error) {
+	payload := &ice_cream.IceCreamQuery{Id: string(args.ID)}
+	resp, err := clients.IceCream.GetById(ctx, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	productID := graphql.ID(resp.ProductId)
+
+	iceCream := &types.IceCream{
+		ID:                    graphql.ID(resp.Id),
+		Name:                  resp.Name,
+		ImageClosed:           resp.ImageClosed,
+		ImageOpen:             resp.ImageOpen,
+		Description:           resp.Description,
+		Story:                 resp.Story,
+		SourcingValues:        &resp.SourcingValues,
+		Ingredients:           &resp.Ingredients,
+		AllergyInfo:           &resp.AllergyInfo,
+		DietaryCertifications: &resp.DietaryCertifications,
+		ProductID:             &productID,
+	}
+
+	return &IceCreamResolver{iceCream}, nil
+}
+
 type Mutation struct{}
 
 func (r *Mutation) CreateIceCream(ctx context.Context, args struct{ Input *types.IceCream }) (*IceCreamResolver, error) {

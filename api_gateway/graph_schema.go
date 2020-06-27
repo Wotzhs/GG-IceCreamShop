@@ -14,6 +14,7 @@ var GraphSchema string = `
 	type Query {
 		login(input: Credentials!): Auth!
 		getIceCreams(query: IceCreamQuery): IceCreamResults!
+		getIceCreamById(id: ID!): IceCream
 	}
 
 	type Mutation {
@@ -55,7 +56,6 @@ var GraphSchema string = `
 	input IceCreamQuery {
 		first: Int
 		after: ID
-		id: ID
 		name: String
 		sourcing_values: [String!]
 		ingredients: [String!]

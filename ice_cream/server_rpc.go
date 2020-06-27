@@ -56,6 +56,32 @@ func (s *IceCreamServerRPC) Get(ctx context.Context, req *ice_cream.IceCreamQuer
 	}, nil
 }
 
+func (s *IceCreamServerRPC) GetById(ctx context.Context, req *ice_cream.IceCreamQuery) (*ice_cream.IceCreamDetails, error) {
+	var iceCream IceCream
+	ID, err := ulid.Parse(req.Id)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+
+	if err := iceCreamService.GetIceCreamByID(ID, &iceCream); err != nil {
+		return nil, status.Errorf(codes.Internal, "%v", err)
+	}
+
+	return &ice_cream.IceCreamDetails{
+		Id:                    iceCream.ID.String(),
+		Name:                  iceCream.Name,
+		ImageClosed:           iceCream.ImageClosed,
+		ImageOpen:             iceCream.ImageOpen,
+		Description:           iceCream.Description,
+		Story:                 iceCream.Story,
+		SourcingValues:        iceCream.SourcingValues,
+		Ingredients:           iceCream.Ingredients,
+		AllergyInfo:           iceCream.AllergyInfo,
+		DietaryCertifications: iceCream.DietaryCertifications,
+		ProductId:             iceCream.ProductID,
+	}, nil
+}
+
 func (s *IceCreamServerRPC) Create(ctx context.Context, req *ice_cream.IceCreamDetails) (*ice_cream.IceCreamDetails, error) {
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {

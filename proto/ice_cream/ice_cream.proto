@@ -8,6 +8,7 @@ package ice_cream;
 
 service IceCream {
 	rpc Get(IceCreamQuery) returns (IceCreams);
+	rpc GetById(IceCreamQuery) returns (IceCreamDetails);
 	rpc Create(IceCreamDetails) returns (IceCreamDetails);
 	rpc Update(IceCreamDetails) returns (IceCreamDetails);
 	rpc Delete(IceCreamDetails) returns (google.protobuf.Empty);

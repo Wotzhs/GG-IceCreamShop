@@ -1,4 +1,4 @@
-package main
+package db
 
 import (
 	"database/sql"
@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var db *sql.DB
+var Conn *sql.DB
 
 func init() {
 	dbURL := os.Getenv("DB_URL")
@@ -24,5 +24,5 @@ func init() {
 		log.Fatalf("failed to ping user db err: %v", err)
 	}
 
-	db = conn
+	Conn = conn
 }

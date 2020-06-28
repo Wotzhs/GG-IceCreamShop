@@ -1,5 +1,44 @@
 version: "3.7"
 services:
+  api_gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.api_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      AUTH_CLIENT_ADDR: auth:50051
+      ICE_CREAM_CLIENT_ADDR: ice_cream:50052
+      USER_CLIENT_ADDR: user:50053
+
+  auth:
+    build:
+      context: .
+      dockerfile: Dockerfile.auth
+    expose:
+      - "50051"
+    environment:
+      JWT_SECRET_KEY: your-preferred-secret-key-or-phrase
+      USER_CLIENT_ADDR: user:50053
+
+  ice_cream:
+    build:
+      context: .
+      dockerfile: Dockerfile.ice_cream
+    expose:
+      - "50052"
+    environment:
+      DB_URL: postgresql://postgres@ice_cream_db/postgres?sslmode=disable
+
+  user:
+    build:
+      context: .
+      dockerfile: Dockerfile.user
+    expose:
+      - "50053"
+    environment:
+      DB_URL: postgresql://postgres@user_db/postgres?sslmode=disable
+
   user_db:
     image: postgres
     ports:

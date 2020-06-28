@@ -20,6 +20,12 @@ RUN make
 WORKDIR $app
 
 RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o /go/bin/$app cmd/app/main.go
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o /go/bin/ice_cream_import cmd/import/main.go
+
+# Copy the built import binary to a targetable stage
+FROM alpine AS import
+
+COPY --from=builder /go/bin/ice_cream_import ./home/ice_cream_import
 
 # Run the application
 FROM scratch

@@ -1,0 +1,27 @@
+# Build the application
+FROM golang:alpine AS builder
+
+ARG project=GG-IceCreamShop
+ARG app=user
+
+RUN mkdir src/$project
+
+WORKDIR src/$project
+
+COPY $app $app
+COPY proto proto
+COPY Makefile go.mod go.sum scripts/alpine_install_protoc.sh ./
+
+RUN chmod +x alpine_install_protoc.sh && ./alpine_install_protoc.sh
+RUN go get github.com/golang/protobuf/protoc-gen-go
+
+WORKDIR $app
+
+RUN CGO_ENABLED=0 go build -ldflags="-w -s" -o /go/bin/$app
+
+# Run the application
+FROM scratch
+
+COPY --from=builder /go/bin/user ./user
+
+ENTRYPOINT ["/user"]

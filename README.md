@@ -7,9 +7,10 @@ GraphQL + gRPC Ice Cream Shop
 1. [Setup](#setup)
 	+ [Setup Protobuf](#protobuf)
 	+ [Setup DB Migration Tool](#migration)
-2. [Getting Started](#getting-started)
+1. [Getting Started](#getting-started)
 	+ [Running Migrations](#running-migrations)
-3. [Importing Ice Creams JSON](#import)
+	+ [Using `docker-compose`](#docker-compose)
+1. [Importing Ice Creams JSON](#import)
 
 ### <a name="setup">Setup</a>
 
@@ -40,6 +41,34 @@ To reset the db, one can use the following command:
 ```shell
 migrate -database "$DB_URL" drop
 ```
+
+#### <a name="docker-compose">Using `docker-compose`</a>
+
+To start the entire stack in a single command with `docker-compose`:
+
+```shell
+docker-compose up -d
+```
+
+To stop:
+
+```shell
+docker-compose down
+```
+
+To reset the data volumes while stopping the docker services:
+
+```shell
+docker-compose down -v
+```
+
+To apply changes in microservice:
+
+```shell
+docker-compose up --build -d
+```
+
+*Note: In the auth section there is the `JWT_SECRET_KEY` value that can be & should be changed to some secure value*
 
 ### <a name="import">Importing Ice Creams JSON</a>
 

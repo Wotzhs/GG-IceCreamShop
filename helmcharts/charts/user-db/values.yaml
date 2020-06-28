@@ -1,0 +1,30 @@
+autoscaling:
+  enabled: false
+
+replicaCount: 1
+
+image: 
+  repository: postgres
+  pullPolicy: IfNotPresent
+  tag: latest
+
+ports:
+  - containerPort: 5432
+
+service:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
+
+configMap:
+  metadata:
+    name: user-db-envs
+    data:
+      - name: POSTGRES_HOST_AUTH_METHOD
+        value: trust
+
+storage:
+  mountPath: /var/lib/postgresql/data
+  pvc:
+    accessModes: ReadWriteOnce
+    storageSize: 1Gi

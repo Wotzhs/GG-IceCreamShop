@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: z-import-ice-cream-db
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: import-ice-cream-db
+          image: seanwong/gg-icecreamshop.ice_cream.import
+          command: ["sh", "/home/scripts/docker_import_ice_cream.sh"]
+          env:
+            - name: DB_URL
+              value: postgres://postgres@ice-cream-db.default.svc.cluster.local/postgres?sslmode=disable
+            - name: DB_HOST
+              value: ice-cream-db.default.svc.cluster.local
+          volumeMounts:
+            - name: import-ice-cream-script
+              mountPath: /home/scripts
+      volumes:
+        - name: import-ice-cream-script
+          configMap:
+            name: import-ice-cream-script
+      restartPolicy: Never
+  backoffLimit: 4

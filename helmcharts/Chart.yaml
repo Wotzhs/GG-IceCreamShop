@@ -1,0 +1,20 @@
+apiVersion: v2
+name: GG-IceCreamShop
+description: A Helm chart for GG-IceCreamShop
+type: application
+version: 0.1.0
+appVersion: 1.16.0
+
+depedencies:
+  - name: api_gateway
+    repository: file://charts/api_gateway
+  - name: auth
+    repository: file://charts/auth
+  - name: ice_cream
+    repository: file://charts/ice_cream
+  - name: ice_cream_db
+    repository: file://charts/ice_cream_db
+  - name: user
+    repository: file://charts/user
+  - name: user_db
+    repository: file://charts/user_db

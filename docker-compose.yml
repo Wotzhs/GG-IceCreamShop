@@ -47,7 +47,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ice_cream
-      target: builder
+      target: import
     volumes:
       - ./scripts/docker_import_ice_cream.sh:/home/docker_import_ice_cream.sh:ro
     environment:

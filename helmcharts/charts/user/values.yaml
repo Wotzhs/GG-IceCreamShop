@@ -1,0 +1,24 @@
+autoscaling:
+  enabled: false
+
+replicaCount: 1
+
+image: 
+  repository: seanwong/gg-icecreamshop.user
+  pullPolicy: Always
+  tag: latest
+
+ports:
+  - containerPort: 50053
+
+service:
+  - protocol: TCP
+    port: 50053
+    targetPort: 50053
+
+configMap:
+  metadata:
+    name: user-envs
+    data:
+      - name: DB_URL
+        value: postgresql://postgres@user-db.default.svc.cluster.local/postgres?sslmode=disable

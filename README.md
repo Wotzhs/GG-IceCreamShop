@@ -3,7 +3,7 @@
 GraphQL + gRPC Ice Cream Shop
 
 ## Table of Contents
-
+1. [Overview](#overview)
 1. [Setup](#setup)
 	+ [Setup Protobuf](#protobuf)
 	+ [Setup DB Migration Tool](#migration)
@@ -11,6 +11,30 @@ GraphQL + gRPC Ice Cream Shop
 	+ [Running Migrations](#running-migrations)
 	+ [Using `docker-compose`](#docker-compose)
 1. [Importing Ice Creams JSON](#import)
+
+### <a name="overview">Overview</a>
+
+```
+                                                    --------
+                                                    | auth |
+                                                    --------
+                                                   -       -
+                                                 -           -
+                                              grpc            gprc
+                                             -                   -
+                                           -                       -
+-------------                      ---------------                   --------          -----------
+| api-users | < - - graphql - - >  | api-gateway | - - -  grpc - - - | user |  < --- > | user_db |
+-------------    GET /graphiql     ---------------                   --------          -----------
+                  POST /query              -
+                                             -               
+                                              grpc
+                                                 -
+                                                   -
+                                                    -------------         ----------------
+                                                    | ice_cream | < --- > | ice_cream_db |
+                                                    -------------         ----------------
+```
 
 ### <a name="setup">Setup</a>
 

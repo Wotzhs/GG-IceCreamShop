@@ -89,6 +89,8 @@ To start the entire stack in a single command with `docker-compose`:
 docker-compose up -d
 ```
 
+By default, the application stack can be accessed at `localhost:8000`, use `/graphiql` if an interactive experience is preferred, otherwise `/query`
+
 To stop:
 
 ```shell
@@ -117,6 +119,19 @@ From the project root, to deploy the entire stack:
 helm install <release-name> helmcharts
 ```
 
+To access the application stack, in the terminal:
+
+```shell
+kubectl get svc/api-gateway
+```
+
+Visit `CLUSTER-IP` address from the output at port 8000 as shown in the sample below:
+
+```shell
+NAME          TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+api-gateway   ClusterIP   10.43.114.123   <none>        8000/TCP   5m37s
+```
+
 To take down the entire stack:
 
 ```shell
@@ -132,6 +147,8 @@ docker build -f Dockerfile.ice_cream --target=import -t seanwong/gg-icecreamshop
 ```
 
 ### <a name="import">Importing Ice Creams JSON</a>
+
+**If you are using the `docker-compose` or `kubernetes` method to start the project, there is no need to perform this step**
 
 The ice icream microservice has the import cli tool included in `cmd/import/main.go`. Presently, it only accepts a `-url` flag and the JSON has to conform to the schema as shown in the <a href="https://gist.githubusercontent.com/penmanglewood/f264e8d926b4c4a9926aa1de8fdb509a/raw/992f3c8a519ecd3d947bc48627ffefcf947f80bd/icecream.json" target="_blank">sample ice creams json</a>.
 

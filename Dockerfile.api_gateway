@@ -10,7 +10,7 @@ WORKDIR src/$project
 
 COPY $app $app 
 COPY proto proto
-COPY Makefile go.mod go.sum alpine_install_protoc.sh ./
+COPY Makefile go.mod go.sum scripts/alpine_install_protoc.sh ./
 
 RUN chmod +x alpine_install_protoc.sh && ./alpine_install_protoc.sh
 RUN go get github.com/golang/protobuf/protoc-gen-go

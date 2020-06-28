@@ -134,9 +134,40 @@ func (s *iceCreamService) GetIceCreams(q *ice_cream.IceCreamQuery, iceCreams *[]
 	return nil
 }
 
-func (s *iceCreamService) GetIceCreamsCount(totalCount *int32) error {
-	totalCountQuery := "SELECT count(id) from ice_creams;"
-	if err := db.Conn.QueryRow(totalCountQuery).Scan(totalCount); err != nil {
+func (s *iceCreamService) GetIceCreamsCount(q *ice_cream.IceCreamQuery, totalCount *int32) error {
+	baseQuery := "SELECT count(id) from ice_creams\n"
+	var queries []string
+	var variables []interface{}
+
+	if q.After != "" {
+		queries = append(queries, fmt.Sprintf("id < $%d", len(queries)+1))
+		ID, err := ulid.Parse(q.After)
+		if err != nil {
+			return err
+		}
+		variables = append(variables, ID)
+	}
+
+	if q.Name != "" {
+		queries = append(queries, fmt.Sprintf("name LIKE '%%' || $%d || '%%'", len(queries)+1))
+		variables = append(variables, q.Name)
+	}
+
+	if len(q.SourcingValues) > 0 {
+		queries = append(queries, fmt.Sprintf("sourcing_values @> $%d", len(queries)+1))
+		variables = append(variables, pq.Array(q.SourcingValues))
+	}
+
+	if len(q.Ingredients) > 0 {
+		queries = append(queries, fmt.Sprintf("ingredients @> $%d", len(queries)+1))
+		variables = append(variables, pq.Array(q.Ingredients))
+	}
+
+	query := baseQuery
+	if len(queries) > 0 {
+		query += "WHERE " + strings.Join(queries, " AND ") + "\n"
+	}
+	if err := db.Conn.QueryRow(query, variables...).Scan(totalCount); err != nil {
 		return err
 	}
 	return nil

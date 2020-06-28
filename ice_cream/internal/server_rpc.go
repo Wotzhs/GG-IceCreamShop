@@ -24,7 +24,7 @@ func (s *IceCreamServerRPC) Get(ctx context.Context, req *ice_cream.IceCreamQuer
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 
-	if err := services.IceCream.GetIceCreamsCount(&totalCount); err != nil {
+	if err := services.IceCream.GetIceCreamsCount(req, &totalCount); err != nil {
 		return nil, status.Errorf(codes.Internal, "%v", err)
 	}
 

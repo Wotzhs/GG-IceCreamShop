@@ -62,6 +62,12 @@ To reset the data volumes while stopping the docker services:
 docker-compose down -v
 ```
 
+To apply changes in microservice:
+
+```shell
+docker-compose up --build -d
+```
+
 *Note: In the auth section there is the `JWT_SECRET_KEY` value that can be & should be changed to some secure value*
 
 ### <a name="import">Importing Ice Creams JSON</a>

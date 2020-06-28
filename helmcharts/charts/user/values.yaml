@@ -9,12 +9,12 @@ image:
   tag: latest
 
 ports:
-  - containerPort: 5432
+  - containerPort: 50053
 
 service:
   - protocol: TCP
-    port: 5432
-    targetPort: 5432
+    port: 50053
+    targetPort: 50053
 
 configMap:
   metadata:

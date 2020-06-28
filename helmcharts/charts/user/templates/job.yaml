@@ -20,14 +20,14 @@ spec:
           volumeMounts:
             - name: db-migrate-script
               mountPath: /home
-            - name: migrations
+            - name: user-db-migrations
               mountPath: /home/migrations
       volumes:
         - name: db-migrate-script
           configMap:
             name: user-db-migration-script
-        - name: migrations
+        - name: user-db-migrations
           configMap:
-            name: migrations
+            name: user-db-migrations
       restartPolicy: Never
   backoffLimit: 4

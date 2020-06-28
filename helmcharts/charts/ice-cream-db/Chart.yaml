@@ -1,0 +1,6 @@
+apiVersion: v2
+name: ice-cream-db
+description: A Helm chart for Ice Cream Postgres Database
+type: application
+version: 0.1.0
+appVersion: 1.16.0

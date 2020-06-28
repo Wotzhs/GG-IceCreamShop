@@ -1,0 +1,28 @@
+autoscaling:
+  enabled: false
+
+replicaCount: 1
+
+image:
+  repository: seanwong/gg-icecreamshop.api_gateway
+  pullPolicy: Always
+  tag: latest
+
+ports:
+  - containerPort: 8000
+
+configMap:
+  metadata:
+    name: api-gateway-envs
+    data:
+      - name: AUTH_CLIENT_ADDR
+        value: auth.default.svc.cluster.local:50051
+      - name: ICE_CREAM_CLIENT_ADDR
+        value: ice-cream.default.svc.cluster.local:50052
+      - name: USER_CLIENT_ADDR
+        value: user.default.svc.cluster.local:50053
+
+service:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000

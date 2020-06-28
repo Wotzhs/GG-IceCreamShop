@@ -1,0 +1,26 @@
+autoscaling:
+  enabled: false
+
+replicaCount: 1
+
+image:
+  repository: seanwong/gg-icecreamshop.auth
+  pullPolicy: Always
+  tag: latest
+
+ports:
+  - containerPort: 50051
+
+configMap:
+  metadata:
+    name: auth-envs
+    data:
+      - name: JWT_SECRET_KEY
+        value: your-preferred-secret-key-or-phrase
+      - name: USER_CLIENT_ADDR
+        value: user.default.svc.cluster.local:50053
+
+service:
+  - protocol: TCP
+    port: 50051
+    targetPort: 50051

@@ -1,0 +1,24 @@
+autoscaling:
+  enabled: false
+
+replicaCount: 1
+
+image: 
+  repository: seanwong/gg-icecreamshop.ice_cream
+  pullPolicy: Always
+  tag: latest
+
+ports:
+  - containerPort: 50052
+
+service:
+  - protocol: TCP
+    port: 50052
+    targetPort: 50052
+
+configMap:
+  metadata:
+    name: ice-cream-envs
+    data:
+      - name: DB_URL
+        value: postgresql://postgres@ice-cream-db.default.svc.cluster.local/postgres?sslmode=disable

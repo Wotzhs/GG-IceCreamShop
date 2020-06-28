@@ -29,6 +29,35 @@ services:
       - "50052"
     environment:
       DB_URL: postgresql://postgres@ice_cream_db/postgres?sslmode=disable
+    restart: on-failure
+
+  ice_cream_migration:
+    image: amd64/alpine
+    volumes:
+      - ./scripts/docker_migrate_db.sh:/home/docker_migrate_db.sh:ro
+      - ./ice_cream/migrations:/home/migrations:ro
+    environment:
+      DB_URL: postgresql://postgres@ice_cream_db/postgres?sslmode=disable
+      DB_HOST: ice_cream_db
+    command: sh /home/docker_migrate_db.sh
+    depends_on:
+      - ice_cream_db
+
+  ice_cream_import:
+    build:
+      context: .
+      dockerfile: Dockerfile.ice_cream
+      target: builder
+    volumes:
+      - ./scripts/docker_import_ice_cream.sh:/home/docker_import_ice_cream.sh:ro
+    environment:
+      DB_URL: postgresql://postgres@ice_cream_db/postgres?sslmode=disable
+      DB_HOST: ice_cream_db
+    command: sh /home/docker_import_ice_cream.sh
+    depends_on:
+      - ice_cream_db
+      - ice_cream_migration
+    restart: on-failure
 
   user:
     build:
@@ -38,6 +67,19 @@ services:
       - "50053"
     environment:
       DB_URL: postgresql://postgres@user_db/postgres?sslmode=disable
+    restart: on-failure
+
+  user_migration:
+    image: amd64/alpine
+    volumes:
+      - ./scripts/docker_migrate_db.sh:/home/docker_migrate_db.sh:ro
+      - ./user/migrations:/home/migrations:ro
+    environment:
+      DB_URL: postgresql://postgres@user_db/postgres?sslmode=disable
+      DB_HOST: user_db
+    command: sh /home/docker_migrate_db.sh
+    depends_on:
+      - user_db
 
   user_db:
     image: postgres
@@ -47,6 +89,7 @@ services:
       - user_db:/var/lib/postgresql/data
     environment:
       POSTGRES_HOST_AUTH_METHOD: trust
+
   ice_cream_db:
     image: postgres
     ports:

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: migrations
+data: 
+  {{ range $path, $a := .Files.Glob "migrations/**.sql" }}
+  {{ base $path }}: {{ printf "%s" $a | toYaml }}
+  {{ end }}

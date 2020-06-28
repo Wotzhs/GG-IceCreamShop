@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: migrate-user-db
+  annotations:
+    "helm.sh/hook": post-install, post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: migrate-user-db
+          image: amd64/alpine
+          command: ["sh", "/home/docker-migrate-db.sh"]
+          env:
+            - name: DB_URL
+              value: postgres://postgres@user-db.default.svc.cluster.local/postgres?sslmode=disable
+            - name: DB_HOST
+              value: user-db.default.svc.cluster.local
+          volumeMounts:
+            - name: db-migrate-script
+              mountPath: /home
+            - name: migrations
+              mountPath: /home/migrations
+      volumes:
+        - name: db-migrate-script
+          configMap:
+            name: user-db-migration-script
+        - name: migrations
+          configMap:
+            name: migrations
+      restartPolicy: Never
+  backoffLimit: 4

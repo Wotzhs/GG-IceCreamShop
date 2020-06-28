@@ -4,12 +4,15 @@ GraphQL + gRPC Ice Cream Shop
 
 ## Table of Contents
 1. [Overview](#overview)
+1. [Available Operations](#operations)
 1. [Setup](#setup)
 	+ [Setup Protobuf](#protobuf)
 	+ [Setup DB Migration Tool](#migration)
 1. [Getting Started](#getting-started)
 	+ [Running Migrations](#running-migrations)
 	+ [Using `docker-compose`](#docker-compose)
+	+ [Using `kubernetes`/`helm`](#kubernetes-helm)
+		+ [Building `gg_icecreamshop.ice_cream.import` image](#build-import-image)
 1. [Importing Ice Creams JSON](#import)
 
 ### <a name="overview">Overview</a>
@@ -34,6 +37,18 @@ GraphQL + gRPC Ice Cream Shop
                                                     -------------         ----------------
                                                     | ice_cream | < --- > | ice_cream_db |
                                                     -------------         ----------------
+```
+
+### <a name="operations">Available Endpoints</a>
+
+The overall operations can be found in the `api_gateway/graph_schema.go`.
+
+The following operations are protected, only authenticated users will be able to use them:
+
+```
+createIceCream
+updateIceCream
+deleteIceCream
 ```
 
 ### <a name="setup">Setup</a>
@@ -93,6 +108,28 @@ docker-compose up --build -d
 ```
 
 *Note: In the auth section there is the `JWT_SECRET_KEY` value that can be & should be changed to some secure value*
+
+### <a name="kubernetes-helm">Using `kubernetes`/`helm`</a>
+
+From the project root, to deploy the entire stack:
+
+```shell
+helm install <release-name> helmcharts
+```
+
+To take down the entire stack:
+
+```shell
+helm uninstall <release-name>
+```
+
+#### <a name="build-import-image">Building `gg_icecreamshop.ice_cream.import` image</a>
+
+The `gg_icecreamshop.ice_cream.import` is built from the `Dockerfile.ice_cream` with the target of `import`
+
+```shell
+docker build -f Dockerfile.ice_cream --target=import -t seanwong/gg-icecreamshop.ice_cream.import .
+```
 
 ### <a name="import">Importing Ice Creams JSON</a>
 

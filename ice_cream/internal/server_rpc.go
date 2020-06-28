@@ -189,6 +189,16 @@ func (s *IceCreamServerRPC) Update(ctx context.Context, req *ice_cream.IceCreamD
 }
 
 func (s *IceCreamServerRPC) Delete(ctx context.Context, req *ice_cream.IceCreamDetails) (*empty.Empty, error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "%v", "unauthenticated access")
+	}
+
+	email, ok := md["email"]
+	if !ok {
+		return nil, status.Errorf(codes.Unauthenticated, "%v", "unauthenticated access")
+	}
+
 	ID, err := ulid.Parse(req.Id)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "%", err)
